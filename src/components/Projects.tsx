@@ -7,11 +7,13 @@ import React, {
 import anime from 'animejs/lib/anime.es.js';
 import * as THREE from 'three';
 import { ExternalLink, Github } from 'lucide-react';
+
 import MedicoxImg from '/assets/MEDICOX.png';
 import PlanoImg from '/assets/PLANO.png';
-import Portfolio from '/public/assets/Portfolio.png'
-import Dogram from '/public/assets/DOGRAM.jpg';
-import Fitclub from '/public/assets/FITCLUB.png';
+import PortfolioImg from '/public/assets/Portfolio.png';
+import DogramImg from '/public/assets/DOGRAM.jpg';
+import FitclubImg from '/public/assets/FITCLUB.png';
+
 interface Project {
   id: number;
   title: string;
@@ -65,32 +67,27 @@ const projects: Project[] = [
       'Personal portfolio with 3D elements, smooth animations, and interactive UI.',
     tech: ['Three.js', 'React', 'Framer Motion', 'Netlify'],
     color: '#00ff41',
-    image:
-      Portfolio,
+    image: PortfolioImg,
     demoUrl: 'https://sankha123.netlify.app/',
     codeUrl: 'https://github.com/sankha1545/portfolio-latest-',
   },
   {
     id: 4,
     title: 'FITCLUB',
-    description:
-      'Just a casual frontend Fitness website ',
-    tech: ['HTML', 'CSS', 'javascript', 'ReactJs'],
+    description: 'Just a casual frontend Fitness website.',
+    tech: ['HTML', 'CSS', 'JavaScript', 'ReactJS'],
     color: '#ff4000',
-    image:
-      Fitclub,
+    image: FitclubImg,
     demoUrl: 'https://factory-vr.example.com',
     codeUrl: 'https://github.com/sankha1545/FITCLUB',
   },
   {
     id: 5,
     title: 'DOGRAM',
-    description:
-      'A Social media web application with only the frontend ',
-    tech: ['React Native','Node.js'],
+    description: 'A Social media web application with only the frontend.',
+    tech: ['React Native', 'Node.js'],
     color: '#8000ff',
-    image:
-      Dogram,
+    image: DogramImg,
     demoUrl: 'https://dogram.example.com',
     codeUrl: 'https://github.com/sankha1545/AlienBrains-DoGram-',
   },
@@ -106,42 +103,57 @@ const Projects: React.FC = () => {
   const cardsRef = useRef<THREE.Mesh[]>([]);
 
   const [currentProject, setCurrentProject] = useState(0);
-  const currentProjectRef = useRef(0);
+  const currentProjectRef = useRef(currentProject);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
 
-  // Sync ref
+  // Keep ref in sync
   useEffect(() => {
     currentProjectRef.current = currentProject;
   }, [currentProject]);
 
-  // Initialize Three.js once
+  // THREE.js setup
   useEffect(() => {
     if (!sceneContainer.current) return;
 
+    // Scene, camera, renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(400, 400);
     renderer.setClearColor(0x000000, 0);
-    sceneContainer.current.appendChild(renderer.domElement);
-
     sceneRef.current = scene;
     cameraRef.current = camera;
     rendererRef.current = renderer;
 
-    // Create cards
+    // Append canvas
+    sceneContainer.current.appendChild(renderer.domElement);
+
+    // Responsive resize handler
+    const resize = () => {
+      if (!sceneContainer.current || !cameraRef.current || !rendererRef.current)
+        return;
+      const width = sceneContainer.current.clientWidth;
+      const height = width; // square aspect
+      cameraRef.current.aspect = width / height;
+      cameraRef.current.updateProjectionMatrix();
+      rendererRef.current.setSize(width, height);
+    };
+    window.addEventListener('resize', resize);
+    resize(); // initial sizing
+
+    // Create project cards
     const radius = 8;
     projects.forEach((proj, idx) => {
       const geo = new THREE.PlaneGeometry(4, 5);
-      const texLoader = new THREE.TextureLoader();
-      const mat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.8 });
-      texLoader.load(proj.image, (tex) => {
+      const mat = new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0.8,
+      });
+      new THREE.TextureLoader().load(proj.image, (tex) => {
         mat.map = tex;
         mat.needsUpdate = true;
       });
       const card = new THREE.Mesh(geo, mat);
       const angle = (idx / projects.length) * Math.PI * 2;
-
       card.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
       card.rotation.y = -angle;
       scene.add(card);
@@ -164,7 +176,7 @@ const Projects: React.FC = () => {
 
     camera.position.z = 15;
 
-    // Animate loop
+    // Animation loop
     let rafId: number;
     const animate = () => {
       rafId = requestAnimationFrame(animate);
@@ -184,13 +196,13 @@ const Projects: React.FC = () => {
 
     return () => {
       cancelAnimationFrame(rafId);
-      renderer.domElement &&
-        sceneContainer.current!.removeChild(renderer.domElement);
+      window.removeEventListener('resize', resize);
+      sceneContainer.current?.removeChild(renderer.domElement);
       renderer.dispose();
     };
-  }, []); // run once
+  }, [isAutoRotating]);
 
-  // Auto-rotate
+  // Auto-rotate timer
   useEffect(() => {
     const id = setInterval(() => {
       if (isAutoRotating) {
@@ -232,7 +244,6 @@ const Projects: React.FC = () => {
     return () => obs.disconnect();
   }, []);
 
-  // User selects a project
   const handleProjectSelect = (idx: number) => {
     setCurrentProject(idx);
     setIsAutoRotating(false);
@@ -244,37 +255,33 @@ const Projects: React.FC = () => {
   return (
     <section
       id="projects"
-      className="relative min-h-screen py-20"
       ref={projectsRef}
+      className="relative py-20 bg-transparent-900"
     >
-      <div className="px-6 mx-auto max-w-7xl">
+      <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         {/* Title */}
-        <div className="mb-16 text-center">
-          <h2 className="mb-6 text-5xl font-bold opacity-0 md:text-7xl project-title">
-            <span className="text-transparent bg-gradient-to-r from-pink-500 to-cyan-500 bg-clip-text glow-text">
-              Featured Projects
-            </span>
-          </h2>
-        </div>
+        <h2 className="mb-12 text-4xl font-extrabold text-center text-transparent opacity-0 sm:text-5xl md:text-6xl bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-500 project-title">
+          Featured Projects
+        </h2>
 
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          {/* Carousel */}
-          <div className="relative opacity-0 project-card">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
+          {/* 3D Carousel */}
+          <div className="opacity-0 project-card">
             <div
               ref={sceneContainer}
-              className="relative w-full max-w-md mx-auto"
+              className="w-full max-w-md mx-auto aspect-square"
               onMouseEnter={() => setIsAutoRotating(false)}
               onMouseLeave={() => setIsAutoRotating(true)}
             />
             {/* Dots */}
-            <div className="flex justify-center mt-8 space-x-4">
+            <div className="flex justify-center mt-6 space-x-3">
               {projects.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleProjectSelect(idx)}
-                  className={`w-3 h-3 rounded-full border-2 transition-all duration-300 ${
+                  className={`w-3 h-3 rounded-full border-2 transition-colors duration-300 ${
                     currentProject === idx
-                      ? 'bg-cyan-400 border-cyan-400 glow-cyan'
+                      ? 'bg-cyan-400 border-cyan-400'
                       : 'border-gray-600 hover:border-cyan-400'
                   }`}
                 />
@@ -288,7 +295,7 @@ const Projects: React.FC = () => {
                     (currentProject + projects.length - 1) % projects.length
                   )
                 }
-                className="neon-button neon-button-small"
+                className="px-4 py-2 transition border border-gray-600 rounded-lg hover:border-cyan-400"
               >
                 ←
               </button>
@@ -296,7 +303,7 @@ const Projects: React.FC = () => {
                 onClick={() =>
                   handleProjectSelect((currentProject + 1) % projects.length)
                 }
-                className="neon-button neon-button-small"
+                className="px-4 py-2 transition border border-gray-600 rounded-lg hover:border-cyan-400"
               >
                 →
               </button>
@@ -306,29 +313,30 @@ const Projects: React.FC = () => {
           {/* Details + Links */}
           <div className="opacity-0 project-card">
             <div
-              className="p-8 border border-gray-700 bg-gradient-to-br from-gray-900/50 via-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl neon-border"
+              className="p-6 border rounded-2xl backdrop-blurbg bg-gradient-to-br from-gray-800/60 to-gray-900/60"
               style={{
                 borderColor: current.color,
-                boxShadow: `0 0 30px ${current.color}20`,
+                boxShadow: `0 0 20px ${current.color}40`,
               }}
             >
-              <h3 className="mb-4 text-3xl font-bold text-white glow-white">
+              <h3
+                className="mb-4 text-2xl font-bold sm:text-3xl"
+                style={{ color: current.color }}
+              >
                 {current.title}
               </h3>
-              <p className="mb-6 text-lg leading-relaxed text-gray-300">
-                {current.description}
-              </p>
+              <p className="mb-6 text-gray-300">{current.description}</p>
 
               {/* Tech Stack */}
-              <div className="mb-8">
-                <h4 className="mb-3 text-sm font-semibold tracking-wider text-gray-400 uppercase">
+              <div className="mb-6">
+                <h4 className="mb-2 text-xs tracking-wide text-gray-400 uppercase">
                   Technologies Used
                 </h4>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
                   {current.tech.map((t, i) => (
                     <span
                       key={t}
-                      className="px-3 py-1 text-sm text-gray-300 transition-colors duration-300 bg-gray-800 border border-gray-600 rounded-full hover:border-cyan-400"
+                      className="px-3 py-1 text-sm transition bg-gray-800 border border-gray-600 rounded-full hover:border-cyan-400"
                       style={{ animationDelay: `${i * 100}ms` }}
                     >
                       {t}
@@ -337,25 +345,25 @@ const Projects: React.FC = () => {
                 </div>
               </div>
 
-              {/* Live Demo & View Code */}
-              <div className="flex gap-4">
+              {/* Links */}
+              <div className="flex flex-col gap-4 sm:flex-row">
                 <a
                   href={current.demoUrl}
                   target="_blank"
-                  rel="noopener"
-                  className="flex items-center gap-2 neon-button neon-button-primary group"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-4 py-2 transition rounded-lg bg-cyan-500 hover:bg-cyan-600"
                 >
                   <ExternalLink size={18} />
-                  <span>Live Demo</span>
+                  Live Demo
                 </a>
                 <a
                   href={current.codeUrl}
                   target="_blank"
-                  rel="noopener"
-                  className="flex items-center gap-2 neon-button neon-button-secondary group"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-4 py-2 transition bg-gray-700 rounded-lg hover:bg-gray-600"
                 >
                   <Github size={18} />
-                  <span>View Code</span>
+                  View Code
                 </a>
               </div>
             </div>
