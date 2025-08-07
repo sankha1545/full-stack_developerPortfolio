@@ -314,7 +314,7 @@ const Contact: React.FC = () => {
       {/* Footer */}
       <footer className="pt-8 mt-20 text-center border-t border-gray-800">
         <p className="text-gray-500">
-          © 2025 Sankha Subhra Das. Crafted with ❤️ and cutting-edge web technologies.
+          © 2025 Sankha Subhra Das.
         </p>
       </footer>
     </section>
