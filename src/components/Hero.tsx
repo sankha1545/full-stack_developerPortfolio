@@ -326,7 +326,7 @@ const Hero: React.FC = () => {
                       <li>🧙‍♂️ Custom Hook Creation & Reusability Charms</li>
                       <li>⚔️ Combatting Memory Leaks & Performance Bottlenecks</li>
                       <li>🪄 TailwindCSS Styling Spells</li>
-                      <li>🌍 RESTful & GraphQL Incantations</li>
+                      <li>🌍 RESTful  Incantations</li>
                       <li>📡 Web APIs, Portals & Cloud Gateways</li>
                       
                     </ul>
