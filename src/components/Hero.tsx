@@ -302,7 +302,10 @@ const Hero: React.FC = () => {
                   <p><em>By the Grace of Code and the Power of Pixels,</em></p>
                   <p>
                     Henceforth, let it be known throughout the digital realm that the bearer of this sacred scroll is hereby
-                    invited to witness the magnificent works and noble feats of this most distinguished Frontend Engineer.
+                    invited to witness the magnificent works and noble feats of this most distinguished Frontend Engineer. <br/>
+                   
+                    <br/>
+                    <a className="font-serif font-bold text-red-500" href="https://drive.google.com/drive/folders/1HQNmgJXU--Bh_YudNy38qJndBcsmlYG3?usp=drive_link">Project reports</a>
                   </p>
                   <div className="p-4 mb-6 text-left rounded-lg shadow-inner bg-amber-100">
                     <h4 className="mb-2 text-xl font-bold text-amber-900">Portfolio Treasures Include:</h4>
@@ -325,6 +328,7 @@ const Hero: React.FC = () => {
                       <li>🪄 TailwindCSS Styling Spells</li>
                       <li>🌍 RESTful & GraphQL Incantations</li>
                       <li>📡 Web APIs, Portals & Cloud Gateways</li>
+                      
                     </ul>
                   </div>
                   <p><em>Sealed with the Digital Wax of Excellence</em></p>
